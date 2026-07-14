@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon L5 LeetCode — Python 3 Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4f0e7; --paper-2:#efe9dc;
+    --ink:#161514; --rule:#111;
+    --teal:#1f97ae; --teal-soft:#5bc0d0;
+    --coral:#e0514c; --amber:#c98a2b; --green:#4d8f5f; --muted:#726c60; --line:#d8d0be;
+    --code-bg:#191f26; --code-fg:#e7e3d8;
+    --code-com:#8aa889; --code-str:#e2b871; --code-kw:#5cc4da; --code-fn:#f0938c; --code-num:#c69cf0;
+    --disp:"Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);background-image:linear-gradient(var(--line) 1px, transparent 1px);background-size:100% 34px;color:var(--ink);font-family:var(--mono);min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:860px;margin:0 auto;padding:26px 18px 60px;}
+
+  .kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);font-weight:700;}
+  h1{font-family:var(--disp);font-weight:700;font-size:clamp(26px,6vw,44px);line-height:.98;letter-spacing:-.01em;margin:4px 0 8px;}
+  .sub{font-size:13px;color:var(--muted);line-height:1.55;max-width:68ch;}
+  .rule{height:6px;background:var(--rule);border-radius:2px;margin:12px 0 14px;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:11.5px;color:var(--muted);margin:0 0 16px;align-items:center;}
+  .legend b{color:var(--ink);}
+  .dot{display:inline-flex;align-items:center;gap:6px;}
+  .pip{width:11px;height:11px;border-radius:50%;display:inline-block;border:2px solid;}
+  .pip.core{background:var(--coral);border-color:var(--coral);}
+  .pip.common{background:transparent;border-color:var(--teal);}
+  .pip.sit{background:transparent;border-color:var(--muted);}
+  .diffdot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .diffdot.Easy{background:var(--green);}
+  .diffdot.Medium{background:var(--amber);}
+  .diffdot.Hard{background:var(--coral);}
+
+  .filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+  .chip{font-size:11.5px;font-weight:600;letter-spacing:.02em;padding:6px 11px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:20px;cursor:pointer;transition:.12s;}
+  .chip:hover{background:var(--paper-2);}
+  .chip.active{background:var(--ink);color:var(--paper);}
+
+  .stage{perspective:1600px;margin-bottom:16px;}
+  .card{position:relative;width:100%;min-height:560px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);cursor:pointer;}
+  .card.flipped{transform:rotateY(180deg);}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fbf8f1;border:2.5px solid var(--ink);border-radius:14px;box-shadow:7px 8px 0 rgba(17,17,17,.9);padding:24px 24px 20px;display:flex;flex-direction:column;overflow:hidden;}
+  .toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .eyebrow{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--teal);}
+  .tier{font-family:var(--disp);font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .tier.core{background:var(--coral);color:#fff;}
+  .tier.common{background:transparent;color:var(--teal);border:1.5px solid var(--teal);}
+  .tier.sit{background:transparent;color:var(--muted);border:1.5px solid var(--muted);}
+
+  .front{align-items:stretch;text-align:center;}
+  .front .center{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+  .numtag{font-family:var(--disp);font-weight:700;font-size:12px;color:var(--muted);}
+  .term{font-family:var(--disp);font-weight:700;letter-spacing:-.01em;line-height:1.04;font-size:clamp(24px,5.6vw,40px);margin-top:6px;}
+  .diffrow{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:10px;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
+  .patterntag{margin-top:10px;font-size:11.5px;color:var(--teal);font-weight:600;}
+  .underbar{height:5px;width:min(360px,72%);background:var(--rule);border-radius:2px;margin:16px auto 0;}
+  .flip-hint{margin-top:16px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;}
+  .flip-hint b{color:var(--coral);font-weight:700;}
+  .arrow{color:var(--coral);font-family:var(--disp);font-weight:700;}
+
+  .back{transform:rotateY(180deg);}
+  .backscroll{overflow-y:auto;flex:1;display:flex;flex-direction:column;padding-right:3px;}
+  .backscroll::-webkit-scrollbar{width:7px;}
+  .backscroll::-webkit-scrollbar-thumb{background:#cfc7b4;border-radius:4px;}
+  .bterm{font-family:var(--disp);font-weight:700;font-size:clamp(16px,3.4vw,21px);margin:3px 0 2px;line-height:1.08;}
+  .bmeta{font-size:10.5px;color:var(--muted);margin-bottom:8px;}
+  .thinrule{height:3px;background:var(--rule);border-radius:2px;margin:0 0 10px;}
+
+  .sectionlabel{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--coral);font-weight:700;margin:0 0 5px;}
+  .approach{font-size:12px;line-height:1.5;color:#242019;margin:0 0 11px;}
+  .approach strong{color:var(--teal);font-weight:700;}
+  .approach code{background:var(--paper-2);border-radius:4px;padding:0 4px;font-size:11px;}
+
+  pre{margin:0 0 11px;background:var(--code-bg);color:var(--code-fg);border-radius:9px;padding:11px 12px;font-family:var(--mono);font-size:11px;line-height:1.48;overflow-x:auto;white-space:pre;border:1px solid #2b333d;}
+  pre::-webkit-scrollbar{height:8px;}
+  pre::-webkit-scrollbar-thumb{background:#39424d;border-radius:4px;}
+  .c-com{color:var(--code-com);font-style:italic;}.c-str{color:var(--code-str);}.c-kw{color:var(--code-kw);}.c-fn{color:var(--code-fn);}.c-num{color:var(--code-num);}
+
+  .cxbox{border-left:4px solid var(--teal);background:#eef8fa;border-radius:0 8px 8px 0;padding:9px 12px;margin:0 0 11px;}
+  .cxbox .cxrow{font-size:11.5px;line-height:1.5;color:#123a41;margin:2px 0;}
+  .cxbox .cxrow b{color:var(--teal);}
+  .cxbox .cxrow.opt{color:#0d2e33;font-weight:600;}
+
+  .edgebox{margin:0 0 4px;}
+  .edgelabel{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:6px;}
+  .edgelist{display:flex;flex-wrap:wrap;gap:6px;}
+  .edgepill{font-size:10.5px;font-weight:600;padding:4px 9px;border:1.5px solid var(--amber);color:#7a5817;border-radius:20px;background:#fbf3e6;}
+
+  .cx{margin-top:auto;padding-top:9px;font-size:10.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px;letter-spacing:.02em;border-top:1px dashed var(--line);}
+
+  .controls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px;}
+  .navbtn{font-family:var(--disp);font-weight:700;font-size:14px;padding:11px 16px;border:2.5px solid var(--ink);background:#fbf8f1;color:var(--ink);border-radius:11px;cursor:pointer;transition:.1s;box-shadow:3px 4px 0 rgba(17,17,17,.85);}
+  .navbtn:hover{transform:translate(-1px,-1px);box-shadow:4px 5px 0 rgba(17,17,17,.85);}
+  .navbtn:active{transform:translate(2px,3px);box-shadow:1px 1px 0 rgba(17,17,17,.85);}
+  .flipbtn{background:var(--coral);color:#fff;}
+  .counter{font-family:var(--disp);font-weight:700;font-size:15px;text-align:center;min-width:70px;}
+  .counter small{display:block;font-family:var(--mono);font-weight:500;font-size:9.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-top:2px;line-height:1.3;}
+  .util{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .util .navbtn{font-size:12px;padding:8px 13px;box-shadow:2px 3px 0 rgba(17,17,17,.85);}
+  .foot{margin-top:26px;font-size:11px;color:var(--muted);text-align:center;line-height:1.7;}
+  .kbd{font-family:var(--mono);border:1px solid var(--muted);border-radius:5px;padding:1px 6px;font-size:10.5px;}
+  @media (max-width:520px){.face{padding:18px 16px;}.navbtn{padding:10px 12px;}body{background-size:100% 30px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Python 3 · Amazon SDE II (L5) coding rounds · brute force &#x2192; optimal</div>
+    <h1>Amazon L5 LeetCode Deck</h1>
+    <p class="sub">The problems most consistently reported in Amazon L5 loops, grouped by pattern. Each card: the approach and why it beats brute force, a working Python 3 solution, the Big O trade-off, and the edge cases worth naming out loud before you're asked.</p>
+    <div class="rule"></div>
+    <div class="legend">
+      <span class="dot"><span class="pip core"></span><b>Core</b> — drill until automatic</span>
+      <span class="dot"><span class="pip common"></span><b>Common</b> — know cold</span>
+      <span class="dot"><span class="pip sit"></span><b>Situational</b> — recognize the pattern</span>
+      <span class="dot"><span class="diffdot Easy"></span>Easy <span class="diffdot Medium"></span>Medium <span class="diffdot Hard"></span>Hard</span>
+    </div>
+  </header>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="stage">
+    <div class="card" id="card" onclick="flip()">
+      <div class="face front">
+        <div class="toprow"><span class="eyebrow" id="f-track"></span><span class="tier" id="f-tier"></span></div>
+        <div class="center">
+          <div class="numtag" id="f-num"></div>
+          <div class="term" id="f-name"></div>
+          <div class="diffrow"><span class="diffdot" id="f-diffdot"></span><span id="f-diff"></span></div>
+          <div class="patterntag" id="f-pattern"></div>
+          <div class="underbar"></div>
+          <div class="flip-hint"><span class="arrow">&#x21BB;</span> flip for approach, code &amp; complexity</div>
+        </div>
+      </div>
+      <div class="face back">
+        <div class="backscroll">
+          <div class="toprow"><span class="eyebrow" id="b-track"></span><span class="tier" id="b-tier"></span></div>
+          <div class="bterm" id="b-name"></div>
+          <div class="bmeta" id="b-meta"></div>
+          <div class="thinrule"></div>
+          <div class="sectionlabel">&#x25B8; Approach</div>
+          <div class="approach" id="b-approach"></div>
+          <pre id="b-code"></pre>
+          <div class="cxbox" id="b-cxbox"></div>
+          <div class="edgebox"><div class="edgelabel">&#x25B8; Edge Cases To Name</div><div class="edgelist" id="b-edges"></div></div>
+          <div class="cx" id="b-cx"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="navbtn" onclick="prev(event)">&#x2039; Prev</button>
+    <div class="counter"><span id="pos">1</span> / <span id="total">1</span><small id="deckname">All</small></div>
+    <button class="navbtn" onclick="next(event)">Next &#x203A;</button>
+  </div>
+  <div class="util">
+    <button class="navbtn flipbtn" onclick="flip(event)">Flip &#x27F3;</button>
+    <button class="navbtn" onclick="shuffle(event)">Shuffle &#x2928;</button>
+    <button class="navbtn" onclick="coreOnly(event)">Core only &#x2605;</button>
+    <button class="navbtn" onclick="reset(event)">Reset &#x21BA;</button>
+  </div>
+
+  <p class="foot">
+    <span class="kbd">&#x2190;</span>/<span class="kbd">&#x2192;</span> navigate &#x00B7; <span class="kbd">Space</span> flip &#x00B7; <span class="kbd">S</span> shuffle &#x00B7; <span class="kbd">C</span> core-only<br>
+    24 problems &#x00B7; verify against LeetCode's live Amazon tag (last 6 months) before the 20th
+  </p>
+</div>
+
+<script>
+const CARDS = [
+/* ===== ARRAYS & HASHING ===== */
+{track:"Arrays & Hashing",tier:"core",num:"#1",name:"Two Sum",diff:"Easy",pattern:"Hashmap complement lookup",
+ approach:"Brute force checks every pair \u2014 <code>O(n\u00b2)</code>. The insight: for each number, you only need to know if its <strong>complement</strong> (target \u2212 x) has already been seen. A hashmap turns that lookup into O(1), so one pass suffices.",
+ code:`def twoSum(nums, target):
+    seen = {}                    # value -> index
+    for i, x in enumerate(nums):
+        complement = target - x
+        if complement in seen:
+            return [seen[complement], i]
+        seen[x] = i
+    return []                    # no solution found`,
+ cx:[["Brute force","O(n\u00b2) time, O(1) space \u2014 nested loop over every pair"],["Optimal","O(n) time, O(n) space \u2014 one pass, hashmap trades space for time"]],
+ edges:["empty array","no valid pair exists","duplicate values (e.g. [3,3], target 6)","negative numbers","same element used twice (must avoid)"]},
+
+{track:"Arrays & Hashing",tier:"core",num:"#238",name:"Product of Array Except Self",diff:"Medium",pattern:"Prefix / suffix product",
+ approach:"Can't just divide by the total product (breaks on zeros). Instead, for each index, the answer is (product of everything to its left) \u00d7 (product of everything to its right). Compute prefix products left-to-right, then fold in suffix products right-to-left in the same output array.",
+ code:`def productExceptSelf(nums):
+    n = len(nums)
+    res = [1] * n
+    prefix = 1
+    for i in range(n):
+        res[i] = prefix
+        prefix *= nums[i]
+    suffix = 1
+    for i in range(n - 1, -1, -1):
+        res[i] *= suffix
+        suffix *= nums[i]
+    return res`,
+ cx:[["Brute force","O(n\u00b2) \u2014 recompute the product for each index"],["Optimal","O(n) time, O(1) extra space (output array doesn't count)"]],
+ edges:["one zero in the array (only that index is nonzero)","two or more zeros (entire output is 0)","negative numbers","single-element array"]},
+
+{track:"Arrays & Hashing",tier:"core",num:"#347",name:"Top K Frequent Elements",diff:"Medium",pattern:"Bucket sort by frequency",
+ approach:"Sorting by frequency is <code>O(n log n)</code>. Since frequency is bounded by n, bucket sort by frequency count is O(n): index i in the bucket array holds all numbers that appear exactly i times, then read buckets from the top down.",
+ code:`from collections import Counter
+def topKFrequent(nums, k):
+    count = Counter(nums)
+    buckets = [[] for _ in range(len(nums) + 1)]
+    for num, freq in count.items():
+        buckets[freq].append(num)
+    res = []
+    for freq in range(len(buckets) - 1, 0, -1):
+        for num in buckets[freq]:
+            res.append(num)
+            if len(res) == k:
+                return res
+    return res`,
+ cx:[["Brute force","sort by frequency, O(n log n)"],["Bucket sort","O(n) time, O(n) space \u2014 optimal"],["Heap alt.","O(n log k) \u2014 better when k is small vs n"]],
+ edges:["k equals the number of unique elements","all elements identical (one bucket holds everything)","empty input","ties in frequency (any valid order acceptable)"]},
+
+{track:"Arrays & Hashing",tier:"common",num:"#937",name:"Reorder Data in Log Files",diff:"Medium",pattern:"Custom sort comparator",
+ approach:"Split logs into letter-logs and digit-logs. Digit-logs keep original relative order (stable sort handles that for free); letter-logs sort by content first, then identifier as a tiebreaker. A custom key function does both in one sorted() call.",
+ code:`def reorderLogFiles(logs):
+    def sort_key(log):
+        id_, rest = log.split(" ", 1)
+        if rest[0].isdigit():
+            return (1,)              # digit logs: keep relative order
+        return (0, rest, id_)        # letter logs: content, then id
+    return sorted(logs, key=sort_key)`,
+ cx:[["Approach","O(n log n \u00b7 L) \u2014 n logs, each comparison touches up to L chars"],["Space","O(n) for the sort"]],
+ edges:["ties in letter-log content (tiebreak by identifier)","all digit logs (order must stay stable)","all letter logs","logs with a single-word body"]},
+
+/* ===== TWO POINTERS & SLIDING WINDOW ===== */
+{track:"Two Pointers & Windows",tier:"core",num:"#3",name:"Longest Substring Without Repeating Characters",diff:"Medium",pattern:"Sliding window + hashmap",
+ approach:"Brute force checks every substring \u2014 O(n\u00b3). Instead, expand a window to the right; when a repeat character appears <em>inside</em> the current window, jump the left edge past its last seen position rather than shrinking one step at a time.",
+ code:`def lengthOfLongestSubstring(s):
+    last_seen = {}
+    left = best = 0
+    for right, ch in enumerate(s):
+        if ch in last_seen and last_seen[ch] >= left:
+            left = last_seen[ch] + 1
+        last_seen[ch] = right
+        best = max(best, right - left + 1)
+    return best`,
+ cx:[["Brute force","O(n\u00b3) \u2014 generate + check every substring"],["Optimal","O(n) time, O(min(n, charset)) space"]],
+ edges:["empty string","all unique characters","all identical characters","single character","repeat character that's outside the current window (must not jump left)"]},
+
+{track:"Two Pointers & Windows",tier:"core",num:"#15",name:"3Sum",diff:"Medium",pattern:"Sort + two pointer",
+ approach:"Brute force is O(n\u00b3). Sort first, then fix one number and two-pointer the rest of the array toward the target \u2014 collapses the inner search to O(n), for O(n\u00b2) total. Skipping duplicate values at each pointer avoids duplicate triplets.",
+ code:`def threeSum(nums):
+    nums.sort()
+    res, n = [], len(nums)
+    for i in range(n - 2):
+        if i > 0 and nums[i] == nums[i - 1]:
+            continue                       # skip duplicate anchors
+        if nums[i] > 0:
+            break                          # sorted: no valid triplet possible
+        lo, hi = i + 1, n - 1
+        while lo < hi:
+            total = nums[i] + nums[lo] + nums[hi]
+            if total == 0:
+                res.append([nums[i], nums[lo], nums[hi]])
+                lo += 1; hi -= 1
+                while lo < hi and nums[lo] == nums[lo - 1]: lo += 1
+                while lo < hi and nums[hi] == nums[hi + 1]: hi -= 1
+            elif total < 0:
+                lo += 1
+            else:
+                hi -= 1
+    return res`,
+ cx:[["Brute force","O(n\u00b3) \u2014 three nested loops"],["Optimal","O(n\u00b2) time, O(1) extra space (sort is in-place, ignoring output)"]],
+ edges:["fewer than 3 elements (return empty)","all zeros","no triplet sums to zero","many duplicate values (must dedupe results)"]},
+
+{track:"Two Pointers & Windows",tier:"core",num:"#42",name:"Trapping Rain Water",diff:"Hard",pattern:"Two pointer with running max",
+ approach:"Water at index i is bounded by min(max height to its left, max height to its right) minus its own height. Precomputing both arrays is O(n)/O(n). The optimal trick: move whichever side has the smaller running max inward \u2014 that side's water is fully determined regardless of what's further on the other side.",
+ code:`def trap(height):
+    if not height:
+        return 0
+    left, right = 0, len(height) - 1
+    left_max, right_max = height[left], height[right]
+    water = 0
+    while left < right:
+        if left_max < right_max:
+            left += 1
+            left_max = max(left_max, height[left])
+            water += left_max - height[left]
+        else:
+            right -= 1
+            right_max = max(right_max, height[right])
+            water += right_max - height[right]
+    return water`,
+ cx:[["Brute force","O(n\u00b2) \u2014 scan left/right max for every index"],["Prefix arrays","O(n) time, O(n) space"],["Two pointer","O(n) time, O(1) space \u2014 optimal"]],
+ edges:["empty array","strictly increasing or decreasing (traps no water)","all bars the same height","fewer than 3 bars"]},
+
+{track:"Two Pointers & Windows",tier:"common",num:"#11",name:"Container With Most Water",diff:"Medium",pattern:"Two pointer, greedy shrink",
+ approach:"Brute force checks all O(n\u00b2) pairs. Start with the widest container (both ends); the shorter wall is always the bottleneck, so moving it inward is the only move that could ever improve the area \u2014 moving the taller wall can only shrink width without raising the limiting height.",
+ code:`def maxArea(height):
+    left, right = 0, len(height) - 1
+    best = 0
+    while left < right:
+        best = max(best, (right - left) * min(height[left], height[right]))
+        if height[left] < height[right]:
+            left += 1
+        else:
+            right -= 1
+    return best`,
+ cx:[["Brute force","O(n\u00b2)"],["Optimal","O(n) time, O(1) space"]],
+ edges:["exactly two elements","all bars equal height","strictly decreasing heights"]},
+
+{track:"Two Pointers & Windows",tier:"common",num:"#763",name:"Partition Labels",diff:"Medium",pattern:"Greedy, last-occurrence map",
+ approach:"A letter forces every partition containing it to extend at least to that letter's last occurrence. Precompute each character's last index; scan once, extending the current partition's end to the max last-index seen so far, and cut when the scan position catches up to that end.",
+ code:`def partitionLabels(s):
+    last = {ch: i for i, ch in enumerate(s)}
+    res = []
+    start = end = 0
+    for i, ch in enumerate(s):
+        end = max(end, last[ch])
+        if i == end:
+            res.append(end - start + 1)
+            start = i + 1
+    return res`,
+ cx:[["Approach","O(n) time, O(1) space (26-letter alphabet bound)"]],
+ edges:["single character","all identical characters (one partition)","all unique characters (each its own partition)"]},
+
+/* ===== STACKS, QUEUES & DESIGN ===== */
+{track:"Stacks, Queues & Design",tier:"core",num:"#146",name:"LRU Cache",diff:"Medium",pattern:"Hashmap + doubly linked list",
+ approach:"Need O(1) get, put, and eviction of the least-recently-used entry. A hashmap alone gives O(1) lookup but no ordering; an array/list gives ordering but O(n) moves. Combine both: hashmap for O(1) node lookup, doubly linked list for O(1) reordering \u2014 move-to-front on access, evict from the tail.",
+ code:`class Node:
+    def __init__(self, key=0, val=0):
+        self.key, self.val = key, val
+        self.prev = self.next = None
+
+class LRUCache:
+    def __init__(self, capacity):
+        self.cap = capacity
+        self.map = {}
+        self.head, self.tail = Node(), Node()   # dummy sentinels
+        self.head.next, self.tail.prev = self.tail, self.head
+
+    def _remove(self, node):
+        node.prev.next, node.next.prev = node.next, node.prev
+
+    def _add_front(self, node):
+        node.next, node.prev = self.head.next, self.head
+        self.head.next.prev = node
+        self.head.next = node
+
+    def get(self, key):
+        if key not in self.map:
+            return -1
+        node = self.map[key]
+        self._remove(node); self._add_front(node)
+        return node.val
+
+    def put(self, key, value):
+        if key in self.map:
+            self._remove(self.map[key])
+        node = Node(key, value)
+        self.map[key] = node
+        self._add_front(node)
+        if len(self.map) > self.cap:
+            lru = self.tail.prev
+            self._remove(lru)
+            del self.map[lru.key]`,
+ cx:[["Approach","O(1) for get and put \u2014 optimal for this problem"],["Space","O(capacity)"]],
+ edges:["capacity of 0","get on a missing key","put on an existing key (update value + move to front)","eviction exactly at capacity"]},
+
+{track:"Stacks, Queues & Design",tier:"common",num:"#155",name:"Min Stack",diff:"Medium",pattern:"Auxiliary stack",
+ approach:"getMin() naively is O(n) if you scan the stack. Maintain a second stack tracking the running minimum at each depth \u2014 push the min-so-far alongside every value, so popping keeps both stacks in sync automatically.",
+ code:`class MinStack:
+    def __init__(self):
+        self.stack = []
+        self.min_stack = []
+
+    def push(self, val):
+        self.stack.append(val)
+        m = val if not self.min_stack else min(val, self.min_stack[-1])
+        self.min_stack.append(m)
+
+    def pop(self):
+        self.stack.pop()
+        self.min_stack.pop()
+
+    def top(self):
+        return self.stack[-1]
+
+    def getMin(self):
+        return self.min_stack[-1]`,
+ cx:[["Naive getMin","O(n) per call if scanning the stack"],["Optimal","O(1) for every operation, O(n) space"]],
+ edges:["duplicate minimum values pushed","negative numbers","pop/top/getMin called on an empty stack (define behavior or assume valid calls per constraints)"]},
+
+{track:"Stacks, Queues & Design",tier:"common",num:"#71",name:"Simplify Path",diff:"Medium",pattern:"Stack-based path parsing",
+ approach:"Split on '/'. Each meaningful segment either pushes a directory name, pops one on '..', or is ignored ('.', empty from double slashes). The stack's final contents, joined with '/', is the canonical path.",
+ code:`def simplifyPath(path):
+    stack = []
+    for part in path.split("/"):
+        if part == "" or part == ".":
+            continue
+        elif part == "..":
+            if stack:
+                stack.pop()
+        else:
+            stack.append(part)
+    return "/" + "/".join(stack)`,
+ cx:[["Approach","O(n) time, O(n) space \u2014 n is the length of the path string"]],
+ edges:["repeated slashes ('//')","trailing slash","'..' at the root (no-op, nothing to pop)","a real directory literally named '...' (not a parent reference)"]},
+
+/* ===== LINKED LISTS ===== */
+{track:"Linked Lists",tier:"core",num:"#138",name:"Copy List with Random Pointer",diff:"Medium",pattern:"Hashmap old\u2192new mapping",
+ approach:"Each node has a next pointer and a random pointer that can point anywhere in the list, including forward. Two passes: first create all new nodes and map old\u2192new; second pass wires next and random on the copies using that map, since by then every target node already exists.",
+ code:`def copyRandomList(head):
+    if not head:
+        return None
+    old_to_new = {}
+    cur = head
+    while cur:
+        old_to_new[cur] = Node(cur.val)
+        cur = cur.next
+    cur = head
+    while cur:
+        old_to_new[cur].next = old_to_new.get(cur.next)
+        old_to_new[cur].random = old_to_new.get(cur.random)
+        cur = cur.next
+    return old_to_new[head]`,
+ cx:[["Hashmap approach","O(n) time, O(n) space"],["O(1) space alt.","interleave copies into the original list (old\u2192copy\u2192old\u2192copy), wire randoms, then split \u2014 same O(n) time, no extra map"]],
+ edges:["empty list","random pointer is None","random pointer points to itself","random pointer points forward (not yet created without two passes)"]},
+
+{track:"Linked Lists",tier:"common",num:"#23",name:"Merge K Sorted Lists",diff:"Hard",pattern:"Min-heap merge",
+ approach:"Merging all lists pairwise or concatenating and sorting is O(N log N) where N is total nodes. A min-heap holding the current head of each list lets you always pop the global minimum in O(log k), giving O(N log k) \u2014 better when k (list count) is much smaller than N.",
+ code:`import heapq
+def mergeKLists(lists):
+    heap = []
+    for i, node in enumerate(lists):
+        if node:
+            heapq.heappush(heap, (node.val, i, node))
+    dummy = tail = ListNode()
+    while heap:
+        val, i, node = heapq.heappop(heap)
+        tail.next = node
+        tail = tail.next
+        if node.next:
+            heapq.heappush(heap, (node.next.val, i, node.next))
+    return dummy.next`,
+ cx:[["Merge pairwise / sort all","O(N log N)"],["Heap of size k","O(N log k) time, O(k) space \u2014 optimal when k \u226a N"]],
+ edges:["empty input array","some lists are empty/None","only one list","all lists empty"]},
+
+/* ===== TREES & GRAPHS ===== */
+{track:"Trees & Graphs",tier:"core",num:"#98",name:"Validate Binary Search Tree",diff:"Medium",pattern:"Recursion with bounds",
+ approach:"Checking only \u201cleft child < node < right child\u201d locally is wrong \u2014 a node deep in the left subtree must be less than every ancestor above it, not just its immediate parent. Pass down a valid (low, high) range that narrows as you descend.",
+ code:`def isValidBST(root, low=float("-inf"), high=float("inf")):
+    if not root:
+        return True
+    if not (low < root.val < high):
+        return False
+    return (isValidBST(root.left, low, root.val) and
+            isValidBST(root.right, root.val, high))`,
+ cx:[["Approach","O(n) time \u2014 visits every node once", ],["Space","O(h) for the recursion stack, h = tree height"]],
+ edges:["duplicate values (must be strictly less/greater, not \u2264/\u2265)","single node","a fully skewed tree (essentially a linked list)","values at integer boundaries (use float('-inf'/'inf'), not INT_MIN/MAX)"]},
+
+{track:"Trees & Graphs",tier:"common",num:"#572",name:"Subtree of Another Tree",diff:"Easy",pattern:"Tree recursion",
+ approach:"For every node in the main tree, check whether the subtree rooted there is structurally identical to the target. Naive is O(m\u00b7n) since sameTree is O(min(m,n)) and you may call it from every node; there's an O(m+n) alternative via tree serialization + string matching, but the naive version is what's expected first.",
+ code:`def isSubtree(root, subRoot):
+    def same_tree(a, b):
+        if not a and not b:
+            return True
+        if not a or not b or a.val != b.val:
+            return False
+        return same_tree(a.left, b.left) and same_tree(a.right, b.right)
+
+    if not root:
+        return False
+    if same_tree(root, subRoot):
+        return True
+    return isSubtree(root.left, subRoot) or isSubtree(root.right, subRoot)`,
+ cx:[["This approach","O(m \u00b7 n) worst case \u2014 m, n are the two tree sizes"],["Optimized","O(m + n) via serialize-and-substring-match (e.g. KMP) \u2014 mention if asked to optimize further"]],
+ edges:["subRoot is a single node","identical trees","a subtree that matches values but not structure","root tree smaller than subRoot"]},
+
+{track:"Trees & Graphs",tier:"core",num:"#200",name:"Number of Islands",diff:"Medium",pattern:"Grid flood fill (BFS/DFS)",
+ approach:"Each unvisited land cell starts a new island; flood-fill (BFS or DFS) marks every connected land cell as visited so it's never recounted. Count how many times you start a fresh flood-fill.",
+ code:`from collections import deque
+def numIslands(grid):
+    if not grid:
+        return 0
+    rows, cols = len(grid), len(grid[0])
+    visited = set()
+    count = 0
+
+    def bfs(r, c):
+        q = deque([(r, c)])
+        visited.add((r, c))
+        while q:
+            row, col = q.popleft()
+            for dr, dc in [(1,0), (-1,0), (0,1), (0,-1)]:
+                nr, nc = row + dr, col + dc
+                if (0 <= nr < rows and 0 <= nc < cols
+                        and grid[nr][nc] == "1" and (nr, nc) not in visited):
+                    visited.add((nr, nc))
+                    q.append((nr, nc))
+
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == "1" and (r, c) not in visited:
+                bfs(r, c)
+                count += 1
+    return count`,
+ cx:[["Approach","O(rows \u00d7 cols) time and space \u2014 every cell visited once"]],
+ edges:["empty grid","all water","all land (one island)","single-cell grid"]},
+
+{track:"Trees & Graphs",tier:"core",num:"#994",name:"Rotting Oranges",diff:"Medium",pattern:"Multi-source BFS",
+ approach:"Seed the BFS queue with every rotten orange at once (not just one) with timestamp 0. Each BFS layer represents one minute passing; the answer is the max timestamp reached, or -1 if fresh oranges remain unreachable.",
+ code:`from collections import deque
+def orangesRotting(grid):
+    rows, cols = len(grid), len(grid[0])
+    q = deque()
+    fresh = 0
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 2:
+                q.append((r, c, 0))
+            elif grid[r][c] == 1:
+                fresh += 1
+
+    minutes = 0
+    while q:
+        r, c, t = q.popleft()
+        minutes = max(minutes, t)
+        for dr, dc in [(1,0), (-1,0), (0,1), (0,-1)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 1:
+                grid[nr][nc] = 2
+                fresh -= 1
+                q.append((nr, nc, t + 1))
+    return minutes if fresh == 0 else -1`,
+ cx:[["Approach","O(rows \u00d7 cols) \u2014 multi-source BFS visits each cell once"]],
+ edges:["no fresh oranges at all (answer is 0)","fresh orange that can never be reached (answer is -1)","no rotten oranges but fresh ones exist (-1)","empty grid"]},
+
+{track:"Trees & Graphs",tier:"common",num:"#127",name:"Word Ladder",diff:"Hard",pattern:"BFS shortest path",
+ approach:"Shortest transformation sequence = shortest path in an implicit graph where words are nodes and an edge connects words one letter apart. BFS guarantees the shortest path in an unweighted graph; generate neighbors on the fly by trying every letter at every position rather than precomputing an adjacency list.",
+ code:`from collections import deque
+def ladderLength(beginWord, endWord, wordList):
+    word_set = set(wordList)
+    if endWord not in word_set:
+        return 0
+    q = deque([(beginWord, 1)])
+    while q:
+        word, steps = q.popleft()
+        if word == endWord:
+            return steps
+        for i in range(len(word)):
+            for c in "abcdefghijklmnopqrstuvwxyz":
+                nxt = word[:i] + c + word[i+1:]
+                if nxt in word_set:
+                    word_set.remove(nxt)     # mark visited
+                    q.append((nxt, steps + 1))
+    return 0`,
+ cx:[["Approach","O(n \u00b7 L\u00b2) \u2014 n words, L letters each, 26 tries per position"]],
+ edges:["endWord not in wordList (0)","beginWord equals endWord","empty wordList","no valid transformation path exists"]},
+
+{track:"Trees & Graphs",tier:"core",num:"#210",name:"Course Schedule II",diff:"Medium",pattern:"Topological sort (Kahn's algorithm)",
+ approach:"A valid course order exists only if the prerequisite graph is acyclic. Kahn's algorithm: repeatedly peel off nodes with in-degree 0 (no unmet prerequisites), decrementing their neighbors' in-degrees. If you can't peel off every node, a cycle exists and no order is possible.",
+ code:`from collections import deque, defaultdict
+def findOrder(numCourses, prerequisites):
+    graph = defaultdict(list)
+    indeg = [0] * numCourses
+    for course, prereq in prerequisites:
+        graph[prereq].append(course)
+        indeg[course] += 1
+
+    q = deque([c for c in range(numCourses) if indeg[c] == 0])
+    order = []
+    while q:
+        node = q.popleft()
+        order.append(node)
+        for nxt in graph[node]:
+            indeg[nxt] -= 1
+            if indeg[nxt] == 0:
+                q.append(nxt)
+    return order if len(order) == numCourses else []`,
+ cx:[["Approach","O(V + E) time and space"]],
+ edges:["a cycle exists (return empty list)","no prerequisites at all (any order works)","duplicate prerequisite pairs","a course listed as its own prerequisite (self-loop = cycle)"]},
+
+/* ===== HEAPS ===== */
+{track:"Heaps",tier:"core",num:"#215",name:"Kth Largest Element in an Array",diff:"Medium",pattern:"Min-heap of size k",
+ approach:"Full sort is O(n log n). Keep a min-heap of the k largest values seen so far: once it's at size k, anything smaller than the heap's minimum can't be in the top k and is skipped, and the heap's root ends up being the kth largest.",
+ code:`import heapq
+def findKthLargest(nums, k):
+    heap = nums[:k]
+    heapq.heapify(heap)
+    for x in nums[k:]:
+        if x > heap[0]:
+            heapq.heapreplace(heap, x)
+    return heap[0]`,
+ cx:[["Sort","O(n log n)"],["Heap of size k","O(n log k) time, O(k) space"],["Quickselect","O(n) average, O(n\u00b2) worst case \u2014 mention as the fastest average-case option"]],
+ edges:["k equals array length (answer is the minimum)","duplicate values","negative numbers","single-element array"]},
+
+{track:"Heaps",tier:"common",num:"#973",name:"K Closest Points to Origin",diff:"Medium",pattern:"Max-heap of size k",
+ approach:"Sorting all points by distance is O(n log n). A max-heap capped at size k keeps only the k closest seen so far \u2014 push a new point, and if the heap exceeds size k, pop the current farthest. Push the distance negated since Python's heapq is a min-heap.",
+ code:`import heapq
+def kClosest(points, k):
+    heap = []
+    for x, y in points:
+        dist = x * x + y * y
+        heapq.heappush(heap, (-dist, x, y))
+        if len(heap) > k:
+            heapq.heappop(heap)
+    return [(x, y) for _, x, y in heap]`,
+ cx:[["Sort all points","O(n log n)"],["Heap of size k","O(n log k) time, O(k) space"],["Quickselect alt.","O(n) average"]],
+ edges:["k equals the number of points","duplicate points","negative coordinates","ties in distance (any valid k-subset acceptable)"]},
+
+{track:"Heaps",tier:"common",num:"#253",name:"Meeting Rooms II",diff:"Medium",pattern:"Heap tracking end times",
+ approach:"Sort meetings by start time. Track the end times of currently \u201cin progress\u201d meetings in a min-heap. For each meeting, if the earliest-ending meeting has already finished by this one's start time, reuse that room (replace its end time); otherwise a new room is needed. The heap's final size is the room count.",
+ code:`import heapq
+def minMeetingRooms(intervals):
+    if not intervals:
+        return 0
+    intervals.sort(key=lambda iv: iv[0])
+    heap = []                       # end times of ongoing meetings
+    for start, end in intervals:
+        if heap and heap[0] <= start:
+            heapq.heapreplace(heap, end)   # reuse the freed room
+        else:
+            heapq.heappush(heap, end)      # need a new room
+    return len(heap)`,
+ cx:[["Approach","O(n log n) time (sort), O(n) space (heap)"]],
+ edges:["no meetings (0 rooms)","back-to-back meetings where end == start (no new room needed)","fully overlapping identical intervals","a single meeting"]},
+
+/* ===== BACKTRACKING & TRIES ===== */
+{track:"Backtracking & Tries",tier:"sit",num:"#212",name:"Word Search II",diff:"Hard",pattern:"Trie + DFS backtracking",
+ approach:"Searching for each word independently with DFS is O(W \u00b7 rows\u00b7cols\u00b74\u1d38). Building a trie from all target words first lets a single DFS pass over the board find every word simultaneously, sharing common prefixes and pruning a branch the moment no word matches it.",
+ code:`class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.word = None
+
+def findWords(board, words):
+    root = TrieNode()
+    for w in words:
+        node = root
+        for ch in w:
+            node = node.children.setdefault(ch, TrieNode())
+        node.word = w
+
+    rows, cols = len(board), len(board[0])
+    res = []
+
+    def dfs(r, c, node):
+        ch = board[r][c]
+        if ch not in node.children:
+            return
+        nxt = node.children[ch]
+        if nxt.word:
+            res.append(nxt.word)
+            nxt.word = None          # avoid duplicate matches
+        board[r][c] = "#"            # mark visited
+        for dr, dc in [(1,0), (-1,0), (0,1), (0,-1)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and board[nr][nc] != "#":
+                dfs(nr, nc, nxt)
+        board[r][c] = ch             # backtrack
+
+    for r in range(rows):
+        for c in range(cols):
+            dfs(r, c, root)
+    return res`,
+ cx:[["Per-word DFS","O(W \u00b7 rows\u00b7cols\u00b74\u1d38) \u2014 W words, L average length"],["Trie + shared DFS","much lower in practice \u2014 shared prefixes prune dead branches early, though worst case is still exponential"]],
+ edges:["empty board","no words match anything on the board","duplicate words in the input list","words sharing long common prefixes (where the trie payoff is biggest)"]},
+];
+
+/* ---- syntax highlighter ---- */
+const KW = new Set(["def","class","return","if","elif","else","while","for","in","not","and","or","is","None","True","False","import","from","self","del","pass","break","continue","lambda","yield","with","as","try","except","finally","raise","global","nonlocal"]);
+const FN = new Set(["print","len","range","set","dict","list","tuple","sum","max","min","append","pop","popleft","add","discard","get","index","setdefault","deque","heapq","heappush","heappop","heapify","heapreplace","join","upper","lower","sorted","enumerate","zip","Counter","defaultdict","isdigit","split","ListNode","Node","TrieNode"]);
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function highlight(code){
+  return code.replace(/(#.*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|([A-Za-z_]\w*)|(\d+)|([\s\S])/g,
+    (m,com,str,word,num,other)=>{
+      if(com!==undefined)  return '<span class="c-com">'+esc(com)+'</span>';
+      if(str!==undefined)  return '<span class="c-str">'+esc(str)+'</span>';
+      if(word!==undefined){
+        if(KW.has(word)) return '<span class="c-kw">'+word+'</span>';
+        if(FN.has(word)) return '<span class="c-fn">'+word+'</span>';
+        return esc(word);
+      }
+      if(num!==undefined)  return '<span class="c-num">'+num+'</span>';
+      return esc(other);
+    });
+}
+
+/* ---- app ---- */
+const TRACKS = ["All", ...Array.from(new Set(CARDS.map(c=>c.track)))];
+let filter="All", deck=CARDS.slice(), idx=0;
+const $=id=>document.getElementById(id);
+const TIER_LABEL={core:"Core",common:"Common",sit:"Situational"};
+
+function buildFilters(){
+  const box=$("filters"); box.innerHTML="";
+  TRACKS.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="chip"+(t===filter?" active":"");
+    b.textContent=t;
+    b.onclick=()=>{filter=t;applyFilter();};
+    box.appendChild(b);
+  });
+}
+function applyFilter(){
+  deck = filter==="All" ? CARDS.slice() : CARDS.filter(c=>c.track===filter);
+  idx=0; buildFilters(); render();
+}
+function render(){
+  const c=deck[idx];
+  $("card").classList.remove("flipped");
+  $("f-track").textContent=c.track;
+  $("b-track").textContent=c.track;
+  ["f","b"].forEach(p=>{
+    const el=$(p+"-tier");
+    el.textContent=TIER_LABEL[c.tier];
+    el.className="tier "+c.tier;
+  });
+  $("f-num").textContent="LeetCode "+c.num;
+  $("f-name").textContent=c.name;
+  $("f-diffdot").className="diffdot "+c.diff;
+  $("f-diff").textContent=c.diff;
+  $("f-pattern").textContent=c.pattern;
+  $("b-name").textContent=c.num+" \u00B7 "+c.name;
+  $("b-meta").textContent=c.pattern+" \u00B7 "+c.diff;
+  $("b-approach").innerHTML=c.approach;
+  $("b-code").innerHTML=highlight(c.code);
+  $("b-cxbox").innerHTML=c.cx.map(([label,text])=>`<div class="cxrow ${label==='Optimal'||label==='Approach'?'opt':''}"><b>${label}:</b> ${text}</div>`).join("");
+  $("b-edges").innerHTML=c.edges.map(e=>`<span class="edgepill">${e}</span>`).join("");
+  $("pos").textContent=idx+1;
+  $("total").textContent=deck.length;
+  $("deckname").textContent=filter;
+  const bs=document.querySelector(".backscroll"); if(bs) bs.scrollTop=0;
+}
+function flip(e){if(e)e.stopPropagation();$("card").classList.toggle("flipped");}
+function next(e){if(e)e.stopPropagation();idx=(idx+1)%deck.length;render();}
+function prev(e){if(e)e.stopPropagation();idx=(idx-1+deck.length)%deck.length;render();}
+function shuffle(e){if(e)e.stopPropagation();for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}idx=0;render();}
+function coreOnly(e){if(e)e.stopPropagation();filter="All";deck=CARDS.filter(c=>c.tier==="core");idx=0;buildFilters();$("deckname").textContent="Core";render();}
+function reset(e){if(e)e.stopPropagation();filter="All";applyFilter();}
+document.addEventListener("keydown",ev=>{
+  if(ev.key==="ArrowRight")next();
+  else if(ev.key==="ArrowLeft")prev();
+  else if(ev.key===" "){ev.preventDefault();flip();}
+  else if(ev.key.toLowerCase()==="s")shuffle();
+  else if(ev.key.toLowerCase()==="c")coreOnly();
+});
+buildFilters();render();
+</script>
+</body>
+</html>
